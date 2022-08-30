@@ -1,4 +1,6 @@
 <script>
+// @ts-nocheck
+
 	import { numberToCurrency } from '$lib/utils';
 	import AddCategory from './ModifyCategory.svelte';
 	import CategoryItem from './CategoryItem.svelte';
