@@ -1,5 +1,5 @@
 <script>
-	import AddCategory from '$lib/AddCategory.svelte';
+	import AddCategory from '$lib/ModifyCategory.svelte';
 	import ModalBase from '$lib/ModalBase.svelte';
 	// @ts-ignore
 	import { Category } from '$lib/models';

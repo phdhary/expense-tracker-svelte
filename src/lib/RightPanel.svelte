@@ -1,40 +1,57 @@
 <script>
-	import { categories, expenses } from '$lib/stores';
-	import { Category } from './models';
 	import { numberToCurrency } from '$lib/utils';
-	let w = expenses.getTotalSpent();
+	import AddCategory from './ModifyCategory.svelte';
+	import CategoryItem from './CategoryItem.svelte';
+	import ModalBase from './ModalBase.svelte';
+	import ModalButton from './ModalButton.svelte';
+	import { categories } from './stores/category_store';
+	import { getTotalSpent } from './stores/expense_store';
+
+	/**
+	 * @type {ModalBase}
+	 */
+	let modalBase;
+
+	/**
+	 * @type {any}
+	 */
+	export let child;
+	export let modalWidth = 28;
+	function updateCategory() {
+		modalBase.showModal();
+	}
 </script>
 
 <div class="right-panel-container">
-	{#each $categories as item}
-		<div class="category-item">
-			<div class="column">
-				<div class="row">
-					<div class="category-name">{item.name}</div>
-					<div class="spent">{numberToCurrency(categories.getTotalSpentOf(item))}</div>
-				</div>
-				<progress max={w} value={categories.getTotalSpentOf(item)} />
-			</div>
-		</div>
-	{/each}
-	<a href="/add_category">Add Category</a>
+	<h1>Total Spent {numberToCurrency($getTotalSpent)}</h1>
+	<div class="category-container">
+		{#each $categories as category}
+			<CategoryItem {category} />
+		{/each}
+	</div>
+	<div class="btn">
+		<ModalButton name={'Add Category'} child={AddCategory} />
+	</div>
 </div>
 
+<ModalBase bind:this={modalBase} {child} --modalWidth="{modalWidth}%">
+	<svelte:fragment slot="child">
+		<AddCategory isUpdating={true} />
+	</svelte:fragment>
+</ModalBase>
+
 <style>
-	progress {
-		width: 100%;
+	.btn {
+		margin-left: auto;
+		margin-right: auto;
 	}
-	.row {
-		width: 100%;
+
+	.category-container {
+		overflow-y: auto;
+		height: 60%;
 		display: flex;
-		flex-direction: row;
-		justify-content: space-between;
-	}
-	.column {
-		display: flex;
-		height: 100%;
+		justify-items: center;
 		flex-direction: column;
-		align-items: flex-start;
 	}
 	.right-panel-container {
 		height: 100%;
@@ -50,26 +67,5 @@
 		display: flex;
 		justify-items: center;
 		flex-direction: column;
-	}
-	.category-name {
-		font-size: 13px;
-	}
-	.category-item {
-		height: 10%;
-		margin-left: 40px;
-		margin-right: 40px;
-	}
-	a {
-		border: none;
-		margin-left: 40px;
-		margin-right: 40px;
-		color: white;
-		padding: 15px 32px;
-		text-align: center;
-		text-decoration: none;
-		display: inline-block;
-		font-size: 16px;
-		background: #101010;
-		border-radius: 8px;
 	}
 </style>

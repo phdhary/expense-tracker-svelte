@@ -1,14 +1,19 @@
 <script>
-	import { balance, categories, expenses } from '$lib/stores';
-	import { Expense, Category } from '$lib/models';
-	import ExpenseItem from '$lib/ExpenseItem.svelte';
-	import { numberToCurrency } from '$lib/utils';
-	import RightPanel from '$lib/RightPanel.svelte';
+	// @ts-nocheck
+
+	import ModalButton from '$lib/ModalButton.svelte';
 	import ExpenseDay from '$lib/ExpenseDay.svelte';
+	import ExpenseItem from '$lib/ExpenseItem.svelte';
+	import RightPanel from '$lib/RightPanel.svelte';
+	import { getPastExpense, getTodayExpense } from '$lib/stores/expense_store';
+	import { balance } from '$lib/stores/balance_store';
+	import { numberToCurrency } from '$lib/utils';
+	import ModifyExpense from '$lib/ModifyExpense.svelte';
 
 	// @ts-ignore
 	let input;
 	let isChangingBalance = false;
+	$: trueBalance = numberToCurrency($balance);
 
 	const addBalance = () => {
 		// @ts-ignore
@@ -17,21 +22,6 @@
 		input.value = '';
 		isChangingBalance = false;
 	};
-
-	const ago = $expenses.filter((v, i) => {
-		if (v.date?.getDate() !== new Date().getDate()) {
-			return v;
-		}
-	});
-	const todays = $expenses.filter((v, i) => {
-		if (
-			// v.date?.getFullYear() === new Date().getFullYear() &&
-			// v.date.getMonth() === new Date().getMonth() &&
-			v.date?.getDate() === new Date().getDate()
-		) {
-			return v;
-		}
-	});
 </script>
 
 <svelte:head>
@@ -41,60 +31,53 @@
 <h1 class="title">Expenses Tracker</h1>
 <section class="expense-section">
 	<RightPanel />
-	<h1>Your balance: {numberToCurrency($balance)}</h1>
+	<h1>Your balance is {trueBalance}</h1>
 	{#if isChangingBalance}
 		<form on:submit|preventDefault={addBalance}>
-			<input type="number" bind:this={input} required />
-			<button type="submit">Add balance</button>
+			<input class="input" type="number" bind:this={input} required />
+			<button class="black-button" type="submit">Add balance</button>
 		</form>
 	{:else}
-		<button on:click={() => (isChangingBalance = true)}>Add balance</button>
+		<button class="black-button" on:click={() => (isChangingBalance = true)}>Add balance</button>
 	{/if}
 
+	<ModalButton name={'Add Expense'} child={ModifyExpense} />
+	
 	<div class="expense-list">
 		<ExpenseDay title="Today" />
-		{#each todays as expense}
+		{#each $getTodayExpense as expense}
 			<ExpenseItem {expense} />
 		{/each}
 
 		<ExpenseDay title="Some days ago" />
-		{#each ago as expense}
+		{#each $getPastExpense as expense}
 			<ExpenseItem {expense} />
 		{/each}
 	</div>
-
-	<a href="/add_expense">Add Expense</a>
 </section>
 
 <style>
+	@import '$lib/styles/button.css';
+	@import '$lib/styles/input.css';
+	form {
+		width: 70%;
+		display: flex;
+		justify-items: center;
+		justify-content: space-between;
+	}
+	.input {
+		padding-left: 20px;
+	}
 	.title {
 		font-weight: 600;
 		font-size: 40px;
 		display: flex;
 		text-align: start;
 	}
-	input {
-		border-radius: 5px;
-		border: none;
-		background-color: #edf0f6;
-	}
-	button,
-	a {
-		border: none;
-		color: white;
-		padding: 15px 32px;
-		text-align: center;
-		text-decoration: none;
-		display: inline-block;
-		font-size: 16px;
-		background: #101010;
-		margin-top: 20px;
-		border-radius: 8px;
-	}
 	.expense-list {
 		display: flex;
 		flex-direction: column;
-		justify-items: left;
+		justify-items: stretch;
 	}
 	.expense-section {
 		display: flex;
