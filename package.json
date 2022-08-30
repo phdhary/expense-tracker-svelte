@@ -28,6 +28,7 @@
 	"dependencies": {
 		"@fontsource/fira-mono": "^4.5.0",
 		"@fontsource/poppins": "^4.5.9",
-		"cookie": "^0.4.1"
+		"cookie": "^0.4.1",
+		"uuid": "^8.3.2"
 	}
 }
